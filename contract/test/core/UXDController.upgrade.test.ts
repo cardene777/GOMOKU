@@ -20,7 +20,7 @@ describe("GMKController upgrade", () => {
       { kind: "uups" }
     );
 
-    expect(await instance.VERSION()).to.equal(2);
+    expect(await instance.VERSION()).to.equal(1);
 
     // upgrade to new version
     const UpgradedGMKController = await ethers.getContractFactory(

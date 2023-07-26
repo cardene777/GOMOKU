@@ -16,13 +16,13 @@ const config: HardhatUserConfig = {
       url: `https://sepolia.infura.io/v3/${INFURA_KEY}`,
       accounts: [`0x${PRIVATE_KEY}`],
     },
-    binancetestnet: {
+    bsctestnet: {
       url: "https://data-seed-prebsc-1-s1.binance.org:8545",
       chainId: 97,
       gasPrice: 20000000000,
       accounts: [`0x${PRIVATE_KEY}`],
     },
-    binance: {
+    bsc: {
       url: "https://bsc-dataseed.binance.org/",
       chainId: 56,
       gasPrice: 20000000000,

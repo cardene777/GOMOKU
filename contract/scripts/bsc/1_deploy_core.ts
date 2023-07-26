@@ -5,6 +5,7 @@ import { GMKController, GMKRouter, GMKToken } from "../../types";
 import { NetworkName, checkNetwork } from "../common/checkNetwork";
 import { loadConfig } from "../common/loaders";
 import { verify } from "../common/verify";
+import type { ContractFactory } from "ethers";
 
 // global consts and vars
 let config: EthereumConfig;
@@ -38,7 +39,7 @@ async function deployContracts() {
   console.log("1 - ready to deploy controller");
   const GMKController = await ethers.getContractFactory("GMKController");
   controller = (await upgrades.deployProxy(
-    GMKController,
+    GMKController as ContractFactory,
     [config.tokens.WETH],
     { kind: "uups" }
   )) as GMKController;

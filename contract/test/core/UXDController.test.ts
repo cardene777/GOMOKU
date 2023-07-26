@@ -74,7 +74,7 @@ describe("GMKController", async () => {
 
     await (await redeemable.approve(controller.address, amount)).wait();
     await expect(
-      controller.redeemForERC20(amount, minAmountOut, bob.address)
+      controller.redeemForLsToken(amount, minAmountOut, bob.address)
     ).to.emit(controller, "Redeemed");
   });
 
@@ -132,7 +132,7 @@ describe("GMKController", async () => {
     await (await controller.whitelistAsset(asset.address, false)).wait();
     await (await redeemable.approve(controller.address, amount)).wait();
     await expect(
-      controller.redeemForERC20(amount, minAmountOut, bob.address)
+      controller.redeemForLsToken(amount, minAmountOut, bob.address)
     ).to.emit(controller, "Redeemed");
   });
 
@@ -194,16 +194,5 @@ describe("GMKController", async () => {
     await expect(
       controller.setRedeemable(newRedeemable.address)
     ).to.be.revertedWith("CtrlRedeemableAlreadySet");
-  });
-
-  it("reverts if sending ETH to contract", async () => {
-    let { controller } = await loadFixture(controllerFixture);
-    const txData = {
-      to: controller.address,
-      value: ethers.utils.parseEther("0.1"),
-    };
-    await expect(admin.sendTransaction(txData)).to.be.revertedWith(
-      "CtrlReceiveNotAllowed"
-    );
   });
 });

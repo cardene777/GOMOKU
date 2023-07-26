@@ -1,4 +1,3 @@
-import { network } from "hardhat";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 export enum NetworkName {
@@ -7,9 +6,9 @@ export enum NetworkName {
     OptimismGoerli = "optimismgoerli",
     Optimism = "optimism",
     Goerli = "goerli",
-  Ethereum = "ethereum",
-  Binance = "binance",
-  BinanceTestnet = "binancetestnet",
+    Ethereum = "ethereum",
+    Bsc = "bsc",
+    BscTestnet = "bsctestnet",
 }
 
 export function checkNetwork(hre: HardhatRuntimeEnvironment, validNetworkNames: string[]) {

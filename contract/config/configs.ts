@@ -7,7 +7,9 @@ export interface LzConfig {
     current: LzPair
     ethereum: LzPair
     optimism: LzPair
-    arbitrum: LzPair 
+    arbitrum: LzPair
+    bsc: LzPair,
+
 }
 
 export interface GovernorParams {
@@ -18,20 +20,35 @@ export interface GovernorParams {
 }
 
 export interface EthereumConfig {
-    settings: {
-        uxpTotalSupply: string
-        governorParams: GovernorParams
-    }
-    addresses: {
-        Deployer: string,
-        TokenReceiver: string,
-        MultisigSafe: string
-    }
-    tokens: {
-        WETH: string
-        USDC: string
-    }
-    layerZero: LzConfig
+  settings: {
+    uxpTotalSupply: string;
+    governorParams: GovernorParams;
+  };
+  addresses: {
+    Deployer: string;
+    TokenReceiver: string;
+    MultisigSafe: string;
+  };
+  tokens: {
+    LSToken: string;
+  };
+  layerZero: LzConfig;
+}
+
+export interface BinanceConfig {
+  settings: {
+    uxpTotalSupply: string;
+    governorParams: GovernorParams;
+  };
+  addresses: {
+    Deployer: string;
+    TokenReceiver: string;
+    MultisigSafe: string;
+  };
+  tokens: {
+    LSToken: string;
+  };
+  layerZero: LzConfig;
 }
 
 export interface OptimismConfig {
@@ -48,8 +65,7 @@ export interface OptimismConfig {
         MultisigSafe: string,
     }
     tokens: {
-        USDC: string,
-        WETH: string
+        LSToken: string
     },
     contracts: {
         PerpClearingHouse: string,
@@ -64,21 +80,20 @@ export interface OptimismConfig {
 }
 
 export interface ArbitrumConfig {
-    settings: {
-        uxpTotalSupply: string
-        governorParams: GovernorParams
-    }
-    addresses: {
-        Deployer: string,
-        TokenReceiver: string,
-        MultisigSafe: string,
-    }
-    tokens: {
-        USDC: string
-        WETH: string
-    },
-    contracts: {
-        RageGmxSeniorVault: string 
-    },
-    layerZero: LzConfig
+  settings: {
+    uxpTotalSupply: string;
+    governorParams: GovernorParams;
+  };
+  addresses: {
+    Deployer: string;
+    TokenReceiver: string;
+    MultisigSafe: string;
+  };
+  tokens: {
+    LSToken: string;
+  };
+  contracts: {
+    RageGmxSeniorVault: string;
+  };
+  layerZero: LzConfig;
 }

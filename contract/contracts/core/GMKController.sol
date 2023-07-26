@@ -28,7 +28,7 @@ contract GMKController is
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
     /// @notice Parameters passed to internal mint function
-    /// @param assetToken The collateral token
+    /// @param assetToken The collateral lsToken
     /// @param assetAmount The collateral amount
     /// @param minAmountOut The min amount to mint
     /// @param receiver The receiver for minted tokens
@@ -41,14 +41,14 @@ contract GMKController is
     }
 
     /// @notice Parameters passed to internal mint function
-    /// @param assetToken The asset token
+    /// @param assetToken The asset lsToken
     /// @param assetAmount The asset amount
     /// @param minAmountOut The min amount to receive in swap
     /// @param receiver The account to receiver redeemed assets
     /// @param intermediary The intermediary account to transfer ERC20 to when redeeming.
-    ///         This is usually the same as the `receiver` parameter when redeeming ERC20.
-    ///         When redeeming ERC20, this is `this` contract, as ERC20 is transferred to this contract,
-    ///         unwrapped, and then ERC20 is sent to `receiver`.
+    /// This is usually the same as the `receiver` parameter when redeeming LSToken.
+    ///When redeeming LSToken, this is `this` contract, as LSToken is transferred to this contract,
+    /// LSToken is sent to `receiver`.
     struct InternalRedeemParams {
         address assetToken;
         uint256 amountToRedeem;
@@ -56,9 +56,9 @@ contract GMKController is
         address intermediary;
     }
 
-    error CtrlNotWhitelisted(address token);
+    error CtrlNotWhitelisted(address lsToken);
     error CtrlNotApproved(
-        address token,
+        address lsToken,
         address owner,
         uint256 amount
     );
@@ -71,29 +71,21 @@ contract GMKController is
     event RouterUpdated(address indexed by, address indexed newRouter);
     event WhitelistUpdated(
         address indexed by,
-        address indexed token,
+        address indexed lsToken,
         bool isWhitelisted
     );
     event Minted(address indexed caller, address indexed receiver, uint256 amount);
     event Redeemed(address indexed caller, address indexed receiver, uint256 amount);
 
-    function initialize(address _token) public initializer {
+    function initialize(address _lsToken) public initializer {
         __UUPSUpgradeable_init();
         __ReentrancyGuard_init();
         __Ownable_init();
 
-        if (!_token.isContract()) {
-            revert CtrlAddressNotContract(_token);
+        if (!_lsToken.isContract()) {
+            revert CtrlAddressNotContract(_lsToken);
         }
-        token = _token;
-    }
-
-    /// @notice Fallback function for this contract to receive ERC20
-    // solhint-disable-next-line no-empty-blocks
-    receive() external payable {
-        if (msg.sender != token) {
-            revert CtrlReceiveNotAllowed(msg.sender);
-        }
+        lsToken = _lsToken;
     }
 
     /////////////////////////////////////////////////////////////////////
@@ -101,8 +93,8 @@ contract GMKController is
     /////////////////////////////////////////////////////////////////////
 
     /// @notice Updates the list of tokens that can be used as collateral.
-    /// @param asset the asset token address
-    /// @param isWhitelisted true if token is being added to the whitelist, false otherwise.
+    /// @param asset the asset lsToken address
+    /// @param isWhitelisted true if lsToken is being added to the whitelist, false otherwise.
     function whitelistAsset(
         address asset,
         bool isWhitelisted
@@ -136,9 +128,9 @@ contract GMKController is
         emit RouterUpdated(msg.sender, _router);
     }
 
-    /// @notice Sets the redeemable token address
+    /// @notice Sets the redeemable lsToken address
     /// @dev Can only be called by governor
-    /// @param _redeemable The redeemable token address
+    /// @param _redeemable The redeemable lsToken address
     function setRedeemable(address _redeemable) external onlyOwner {
         if (address(redeemable) != address(0)) {
             revert CtrlRedeemableAlreadySet(address(redeemable));
@@ -182,7 +174,7 @@ contract GMKController is
     ///////////////////////////////////////////////////////////////////////////
 
     /// @notice Mints redeemable tokens by deposirting assets
-    /// @param assetToken the token being used as collateral
+    /// @param assetToken the lsToken being used as collateral
     /// @param assetAmount The assetAmount of `assetToken` used to mint.
     /// @return amountOut The amount of redeemable minted
     function mint(
@@ -191,7 +183,7 @@ contract GMKController is
         uint256 minAmountOut,
         address receiver
     ) external nonReentrant returns (uint256) {
-        // 1. check that token is approved
+        // 1. check that lsToken is approved
         // 2. get clearing house from router
         // 3. transfer tokens from msg.sender to clearing house
         // 4. execute perp tx
@@ -220,18 +212,18 @@ contract GMKController is
     }
 
     /// @notice Mints GMK with ERC20 as collateral.
-    /// @dev Contract wraps ERC20 to ERC20 and deposits ERC20 in DEX vault
+    /// @dev Dpeposits ERC20 in DEX vault
     function mintWithERC20(uint256 minAmountOut, uint256 amount, address receiver)
         external
         payable
         nonReentrant
         returns (uint256)
     {
-        address collateral = token;
+        address collateral = lsToken;
         address depository = router.findDepositoryForDeposit(collateral, amount);
 
         // Deposit ERC20 with ERC20 contract and mint ERC20
-        IERC20Upgradeable(token).safeTransfer(depository, amount);
+        IERC20Upgradeable(lsToken).safeTransfer(depository, amount);
         InternalMintParams memory mintParams = InternalMintParams({
             assetToken: collateral,
             assetAmount: msg.value,
@@ -264,9 +256,9 @@ contract GMKController is
         return amountOut;
     }
 
-    /// @notice Redeems a given amount of redeemable token.
-    /// @param assetToken the token to receive by redeeming.
-    /// @param redeemAmount The amount to redeemable token being redeemed.
+    /// @notice Redeems a given amount of redeemable lsToken.
+    /// @param assetToken the lsToken to receive by redeeming.
+    /// @param redeemAmount The amount to redeemable lsToken being redeemed.
     /// @param minAmountOut The min amount of `assetToken` to receive.
     /// @param receiver The account to receive assets
     function redeem(
@@ -286,16 +278,16 @@ contract GMKController is
         return amountOut;
     }
 
-    function redeemForERC20(
+    function redeemForLsToken(
         uint256 redeemAmount,
         uint256 minAmonuntOut,
         address payable receiver
     ) external nonReentrant returns (uint256) {
         // 1. redeem ERC20 to controller
-        // 3. Transfer ERC20 to user
+        // 2. Transfer LSToken to user
 
         InternalRedeemParams memory rp = InternalRedeemParams({
-            assetToken: token,
+            assetToken: lsToken,
             amountToRedeem: redeemAmount,
             minAmountOut: minAmonuntOut,
             intermediary: address(this)
@@ -303,15 +295,15 @@ contract GMKController is
 
         uint256 amountOut = _redeem(rp);
 
-        // Check the contract's balance of the ERC20 token before transferring
-        uint256 contractBalance = IERC20Upgradeable(token).balanceOf(address(this));
+        // Check the contract's balance of the lsToken before transferring
+        uint256 contractBalance = IERC20Upgradeable(lsToken).balanceOf(address(this));
         require(contractBalance >= amountOut, "Insufficient ERC20 balance in the contract");
 
-        // Approve the transfer of ERC20 tokens from the contract to the receiver
-        IERC20Upgradeable(token).approve(receiver, amountOut);
+        // Approve the transfer of lsToken tokens from the contract to the receiver
+        IERC20Upgradeable(lsToken).approve(receiver, amountOut);
 
-        // Transfer ERC20 tokens to the receiver
-        IERC20Upgradeable(token).transfer(receiver, amountOut);
+        // Transfer lsToken tokens to the receiver
+        IERC20Upgradeable(lsToken).transfer(receiver, amountOut);
 
         emit Redeemed(msg.sender, receiver, amountOut);
         return amountOut;
@@ -352,7 +344,7 @@ contract GMKController is
     /// @dev Returns the current version of this contract
     // solhint-disable-next-line func-name-mixedcase
     function VERSION() external pure virtual returns (uint8) {
-        return 2;
+        return 1;
     }
 
     /// @dev called on upgrade. only owner can call upgrade function

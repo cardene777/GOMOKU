@@ -23,5 +23,5 @@ abstract contract GMKControllerStorage {
     address[] public assetList;
 
     /// token address
-    address public token;
+    address public lsToken;
 }

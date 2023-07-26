@@ -1,32 +1,27 @@
 import { ethers } from "hardhat";
-import { ArbitrumConfig } from "./configs";
-
-export const config: ArbitrumConfig = {
+import { EthereumConfig } from "./configs";
+export const config: EthereumConfig = {
   settings: {
-    uxpTotalSupply: "0",
+    uxpTotalSupply: "7000000000",
     governorParams: {
-      // 1 block ~= 2 seconds
-      votingDelay: 450, // 450 seconds/15 minutes
-      votingPeriod: 1800 * 2 * 2, // seconds * hours * days (1h = 1800), for 2 days use 1800 * 24 * 2 86400
+      votingDelay: 50,
+      votingPeriod: 600,
       proposalThreshold: ethers.utils.parseEther("1").toString(),
       quorumFraction: 50,
     },
   },
-  contracts: {
-    RageGmxSeniorVault: "0xf9305009FbA7E381b3337b5fA157936d73c2CF36",
-  },
   addresses: {
     Deployer: "0x96223b32A75a22de7c192A1b99366c7eD12c1649",
-    TokenReceiver: "0x6d4B37f17Daad093D2Ed535050783e51fAAb5661",
-    MultisigSafe: ethers.constants.AddressZero,
+    TokenReceiver: "0x96223b32A75a22de7c192A1b99366c7eD12c1649",
+    MultisigSafe: "0x86A07dDED024121b282362f4e7A249b00F5dAB37",
   },
   tokens: {
-    LSToken: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+    LSToken: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
   },
   layerZero: {
     current: {
-      chainId: "110",
-      endpoint: "0x3c2269811836af69497E5F486A85D7316753cf62",
+      chainId: "102",
+      endpoint: "0x3c2269811836af69497e5f486a85d7316753cf62",
     },
     ethereum: {
       chainId: "101",
